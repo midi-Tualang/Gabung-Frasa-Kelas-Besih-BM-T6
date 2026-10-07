@@ -8,11 +8,20 @@
     <style>
         .selected { transform: scale(0.95); opacity: 0.8; border-color: #2563eb; border-width: 2px; box-shadow: 0 0 10px rgba(37,99,235,0.5); }
         .disabled { pointer-events: none; opacity: 0.4; filter: grayscale(100%); }
-        .fade-in { animation: fadeIn 0.5s; }
+        .fade-in { animation: fadeIn 0.5s ease-in-out; }
+        .pop-in { animation: popIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes popIn { 
+            0% { opacity: 0; transform: scale(0.5); } 
+            100% { opacity: 1; transform: scale(1); } 
+        }
+        
+        /* Inden untuk perenggan karangan di dalam hadiah */
+        .karangan-format p { text-indent: 2rem; margin-bottom: 0.75rem; text-align: justify; }
     </style>
 </head>
-<body class="bg-slate-100 p-4 md:p-8 font-sans text-gray-800">
+<body class="bg-slate-100 p-4 md:p-8 font-sans text-gray-800 relative">
 
     <div class="max-w-5xl mx-auto bg-white rounded-xl shadow-xl p-6 border-t-4 border-blue-600">
         <h1 class="text-2xl md:text-3xl font-bold text-center text-blue-800 mb-2">Latihan Membina Perenggan Terancang</h1>
@@ -28,7 +37,7 @@
             <button onclick="mulaLatihan()" class="mt-6 w-full bg-blue-600 text-white p-3 rounded-lg hover:bg-blue-700 font-bold text-lg transition-colors shadow-md">Mula Latihan</button>
         </div>
 
-        <!-- Ruangan Latihan (Disembunyikan pada mulanya) -->
+        <!-- Ruangan Latihan -->
         <div id="exerciseArea" class="hidden fade-in">
             <div class="flex justify-between items-center mb-4 bg-gray-800 text-white p-3 rounded-lg">
                 <h2 id="tajukPerenggan" class="font-bold text-lg">Perenggan 1: Pendahuluan</h2>
@@ -63,13 +72,41 @@
 
             <button id="btnSeterusnya" onclick="perengganSeterusnya()" class="mb-8 w-full bg-indigo-600 text-white p-3 rounded-lg hover:bg-indigo-700 font-bold hidden shadow-md">Teruskan ke Perenggan Seterusnya &rarr;</button>
 
-            <!-- Paparan Karangan Penuh Secara Langsung -->
+            <!-- Paparan Karangan Sedang Dibina -->
             <div class="mt-4 border-t-2 border-gray-200 pt-6">
-                <h3 class="font-bold text-xl mb-3 text-gray-800 flex items-center"><svg class="w-6 h-6 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg> Karangan Anda:</h3>
-                <div id="fullEssay" class="p-6 bg-yellow-50 border border-yellow-200 rounded-lg text-gray-800 leading-relaxed text-justify shadow-inner min-h-[150px] whitespace-pre-line font-serif text-lg"></div>
+                <h3 class="font-bold text-xl mb-3 text-gray-800 flex items-center">📝 Karangan Anda:</h3>
+                <div id="fullEssay" class="p-6 bg-gray-50 border border-gray-200 rounded-lg text-gray-700 leading-relaxed text-justify shadow-inner min-h-[150px] whitespace-pre-line font-serif text-lg"></div>
             </div>
 
-            <button id="btnHantar" onclick="hantarData()" class="mt-8 w-full bg-green-600 text-white p-4 rounded-lg hover:bg-green-700 font-bold text-xl hidden shadow-lg uppercase tracking-wider">Hantar Markah PBD</button>
+            <button id="btnHantar" onclick="hantarData()" class="mt-8 w-full bg-green-600 text-white p-4 rounded-lg hover:bg-green-700 font-bold text-xl hidden shadow-lg uppercase tracking-wider animate-pulse">Hantar Markah PBD</button>
+        </div>
+    </div>
+
+    <!-- MODAL HADIAH KARANGAN PENUH (Disembunyikan pada awalnya) -->
+    <div id="modalHadiah" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-gray-900 bg-opacity-70 backdrop-blur-sm p-4">
+        <div class="bg-amber-50 w-full md:w-3/4 lg:w-2/3 max-h-[90vh] flex flex-col rounded-2xl shadow-2xl overflow-hidden pop-in border-4 border-yellow-500">
+            
+            <!-- Header Hadiah -->
+            <div class="bg-gradient-to-r from-yellow-400 via-amber-500 to-yellow-400 p-6 text-center relative shadow-md z-10">
+                <div class="absolute top-3 left-4 text-4xl">✨</div>
+                <div class="absolute top-3 right-4 text-4xl">🎉</div>
+                <h2 class="text-3xl md:text-4xl font-extrabold text-white drop-shadow-lg tracking-wider uppercase">Syabas & Tahniah!</h2>
+                <p class="text-amber-100 font-bold mt-2 text-lg drop-shadow-md">Anda telah berjaya membina sebuah karangan yang cemerlang! 🏆</p>
+            </div>
+
+            <!-- Isi Karangan (Boleh discroll) -->
+            <div class="p-6 md:p-10 overflow-y-auto custom-scrollbar bg-[url('https://www.transparenttextures.com/patterns/cream-paper.png')] flex-grow">
+                <h3 class="text-2xl font-bold text-center text-gray-800 mb-8 pb-2 border-b-2 border-gray-400 inline-block w-full uppercase tracking-wide">Cara-cara Memastikan Kelas Sentiasa Bersih dan Selesa</h3>
+                
+                <div id="teksHadiah" class="karangan-format text-gray-900 text-lg md:text-xl font-serif leading-loose">
+                    <!-- Teks karangan akan dimasukkan di sini melalui Javascript -->
+                </div>
+            </div>
+
+            <!-- Footer Modal -->
+            <div class="bg-yellow-100 p-4 border-t border-yellow-300 text-center shadow-inner z-10">
+                <button onclick="tutupModalHadiah()" class="bg-red-500 hover:bg-red-600 text-white font-bold py-3 px-8 rounded-full shadow-lg transition-transform transform hover:scale-105 text-lg">Tutup Hadiah & Hantar Markah</button>
+            </div>
         </div>
     </div>
 
@@ -77,7 +114,7 @@
         // MASUKKAN URL GOOGLE APPS SCRIPT CIKGU DI SINI
         const gasURL = "https://script.google.com/macros/s/AKfycbxGvYFd2WiZf75yo1MMVpf4m239WtWfKYWk_tNaAKHpbhI80-G2PocWppl14Dkv-Oo/exec";
 
-        // Pangkalan Data Lengkap 6 Perenggan (Dari Google Sheet)
+        // Pangkalan Data Lengkap 6 Perenggan
         const dataKarangan = [
             {
                 tajuk: "Perenggan 1: Pendahuluan",
@@ -130,11 +167,11 @@
         ];
 
         let indeksPerengganSemasa = 0;
-        let idAyatDijangka = 1; // Mesti mula dengan Ayat 1 (Idea Utama)
+        let idAyatDijangka = 1; 
         let pilihan = { a: null, b: null, c: null };
         let markah = 0;
         let perengganTerkumpul = "";
-        let karanganPenuh = "";
+        let karanganPenuhArray = []; // Gunakan Array untuk mudah format perenggan di Modal
 
         function mulaLatihan() {
             const nama = document.getElementById('nama').value.trim();
@@ -154,7 +191,7 @@
             const dataSemasa = dataKarangan[indeksPerengganSemasa];
             document.getElementById('tajukPerenggan').innerText = dataSemasa.tajuk;
             
-            idAyatDijangka = 1; // Reset kepada Idea Utama untuk setiap perenggan
+            idAyatDijangka = 1; 
             perengganTerkumpul = "";
             resetPilihan();
             kemasKiniStatus("", "");
@@ -163,14 +200,13 @@
             const colB = document.getElementById('colB');
             const colC = document.getElementById('colC');
 
-            // Ekstrak dan rawakkan frasa
             let frasaA = rawakSusunan(dataSemasa.ayat.map(d => ({id: d.id, teks: d.a})));
             let frasaB = rawakSusunan(dataSemasa.ayat.map(d => ({id: d.id, teks: d.b})));
             let frasaC = rawakSusunan(dataSemasa.ayat.map(d => ({id: d.id, teks: d.c})));
 
-            colA.innerHTML = frasaA.map(f => `<button id="a-${f.id}" onclick="pilihFrasa('a', ${f.id}, this)" class="p-3 bg-white border border-gray-300 shadow-sm rounded-lg text-sm text-left hover:bg-blue-100 hover:border-blue-400 transition-all focus:outline-none">${f.teks}</button>`).join('');
-            colB.innerHTML = frasaB.map(f => `<button id="b-${f.id}" onclick="pilihFrasa('b', ${f.id}, this)" class="p-3 bg-white border border-gray-300 shadow-sm rounded-lg text-sm text-left hover:bg-amber-100 hover:border-amber-400 transition-all focus:outline-none">${f.teks}</button>`).join('');
-            colC.innerHTML = frasaC.map(f => `<button id="c-${f.id}" onclick="pilihFrasa('c', ${f.id}, this)" class="p-3 bg-white border border-gray-300 shadow-sm rounded-lg text-sm text-left hover:bg-emerald-100 hover:border-emerald-400 transition-all focus:outline-none">${f.teks}</button>`).join('');
+            colA.innerHTML = frasaA.map(f => `<button id="a-${f.id}" onclick="pilihFrasa('a', ${f.id}, this)" class="p-3 bg-white border border-gray-300 shadow-sm rounded-lg text-sm text-left hover:bg-blue-100 transition-all">${f.teks}</button>`).join('');
+            colB.innerHTML = frasaB.map(f => `<button id="b-${f.id}" onclick="pilihFrasa('b', ${f.id}, this)" class="p-3 bg-white border border-gray-300 shadow-sm rounded-lg text-sm text-left hover:bg-amber-100 transition-all">${f.teks}</button>`).join('');
+            colC.innerHTML = frasaC.map(f => `<button id="c-${f.id}" onclick="pilihFrasa('c', ${f.id}, this)" class="p-3 bg-white border border-gray-300 shadow-sm rounded-lg text-sm text-left hover:bg-emerald-100 transition-all">${f.teks}</button>`).join('');
             
             document.getElementById('btnSeterusnya').classList.add('hidden');
         }
@@ -179,60 +215,50 @@
             document.querySelectorAll(`#col${lajur.toUpperCase()} button`).forEach(btn => btn.classList.remove('selected'));
             elemen.classList.add('selected');
             pilihan[lajur] = { id: id, teks: elemen.innerText, el: elemen };
-
             semakCantuman();
         }
 
         function semakCantuman() {
             if (pilihan.a && pilihan.b && pilihan.c) {
-                // Semakan 1: Adakah cantuman frasa betul? (Sintaksis)
                 if (pilihan.a.id === pilihan.b.id && pilihan.b.id === pilihan.c.id) {
-                    
-                    // Semakan 2: Adakah urutan wacana betul? (Wacana)
                     if (pilihan.a.id === idAyatDijangka) {
-                        // BETUL KEDUA-DUANYA
                         kemasKiniStatus("Tepat! Susunan wacana betul.", "text-green-600");
-                        markah += 5; // 5 markah setiap ayat
+                        markah += 5; 
                         document.getElementById('markahSemasa').innerText = "Markah: " + markah;
                         
-                        // Bina perenggan
                         perengganTerkumpul += `${pilihan.a.teks} ${pilihan.b.teks} ${pilihan.c.teks} `;
-                        paparKarangan(karanganPenuh + perengganTerkumpul);
+                        paparKaranganDraft();
 
-                        // Matikan butang yang dah diselesaikan
                         pilihan.a.el.classList.add('disabled', 'bg-gray-100', 'text-gray-400');
                         pilihan.b.el.classList.add('disabled', 'bg-gray-100', 'text-gray-400');
                         pilihan.c.el.classList.add('disabled', 'bg-gray-100', 'text-gray-400');
                         
-                        idAyatDijangka++; // Tingkatkan logik ke ayat seterusnya (Huraian -> Kesimpulan)
+                        idAyatDijangka++; 
                         resetPilihan();
 
-                        // Jika selesai 3 ayat dalam perenggan semasa
                         if (idAyatDijangka > 3) {
-                            karanganPenuh += perengganTerkumpul + "\n\n"; // Simpan ke karangan master
-                            kemasKiniStatus("Syabas! Anda telah menyusun perenggan ini dengan sempurna.", "text-blue-600");
+                            karanganPenuhArray.push(perengganTerkumpul.trim()); 
+                            kemasKiniStatus("Syabas! Anda telah menyusun perenggan ini.", "text-blue-600");
                             
                             if (indeksPerengganSemasa < dataKarangan.length - 1) {
                                 document.getElementById('btnSeterusnya').classList.remove('hidden');
                             } else {
-                                paparKarangan(karanganPenuh);
-                                document.getElementById('btnHantar').classList.remove('hidden');
-                                kemasKiniStatus("Tahniah! Anda telah menyiapkan keseluruhan karangan.", "text-green-700");
+                                paparKaranganDraft(); // Update draft
+                                kemasKiniStatus("Tamat! Membuka hadiah karangan...", "text-green-700");
+                                
+                                // Tunjukkan Modal Hadiah secara automatik dengan sedikit delay
+                                setTimeout(bukaModalHadiah, 800);
                             }
                         }
                     } else {
-                        // KESILAPAN: Cantuman frasa betul, tetapi urutan idea salah
-                        let labelAyat = idAyatDijangka === 1 ? "Ayat 1 (Idea Utama)" : (idAyatDijangka === 2 ? "Ayat 2 (Huraian)" : "Ayat 3 (Kesimpulan/Contoh)");
-                        kemasKiniStatus(`Frasa betul, tetapi urutan salah! Anda perlu mencari frasa untuk <strong>${labelAyat}</strong> dahulu.`, "text-orange-600");
-                        markah -= 1; // Denda ringan
+                        kemasKiniStatus(`Urutan salah! Anda perlu mencari frasa untuk Ayat ${idAyatDijangka} dahulu.`, "text-orange-600");
+                        markah -= 1; 
                         document.getElementById('markahSemasa').innerText = "Markah: " + markah;
                         resetPilihanSemuka();
                     }
-
                 } else {
-                    // KESILAPAN: Cantuman frasa salah dari awal
-                    kemasKiniStatus("Cantuman frasa kurang tepat. Sila cuba lagi!", "text-red-600");
-                    markah -= 1; // Denda ringan
+                    kemasKiniStatus("Cantuman frasa kurang tepat. Cuba lagi!", "text-red-600");
+                    markah -= 1; 
                     document.getElementById('markahSemasa').innerText = "Markah: " + markah;
                     resetPilihanSemuka();
                 }
@@ -240,12 +266,31 @@
         }
 
         function kemasKiniStatus(mesej, kelasWarna) {
-            const status = document.getElementById('statusCantuman');
-            status.innerHTML = `<span class="${kelasWarna} fade-in">${mesej}</span>`;
+            document.getElementById('statusCantuman').innerHTML = `<span class="${kelasWarna} fade-in">${mesej}</span>`;
         }
 
-        function paparKarangan(teks) {
-            document.getElementById('fullEssay').innerText = teks;
+        function paparKaranganDraft() {
+            let teksSemasa = karanganPenuhArray.join("\n\n");
+            if (perengganTerkumpul && idAyatDijangka <= 3) {
+                teksSemasa += (teksSemasa ? "\n\n" : "") + perengganTerkumpul;
+            }
+            document.getElementById('fullEssay').innerText = teksSemasa;
+        }
+
+        function bukaModalHadiah() {
+            // Format karangan dengan tag <p> untuk CSS text-indent
+            const htmlKarangan = karanganPenuhArray.map(p => `<p>${p}</p>`).join("");
+            document.getElementById('teksHadiah').innerHTML = htmlKarangan;
+            
+            // Paparkan Modal
+            document.getElementById('modalHadiah').classList.remove('hidden');
+        }
+
+        function tutupModalHadiah() {
+            // Tutup Modal
+            document.getElementById('modalHadiah').classList.add('hidden');
+            // Munculkan butang Hantar Markah
+            document.getElementById('btnHantar').classList.remove('hidden');
         }
 
         function resetPilihan() { pilihan = { a: null, b: null, c: null }; }
@@ -265,6 +310,7 @@
         function hantarData() {
             const btn = document.getElementById('btnHantar');
             btn.innerText = "Menghantar ke Pangkalan Data...";
+            btn.classList.remove('animate-pulse');
             btn.disabled = true;
             btn.classList.replace('bg-green-600', 'bg-gray-500');
 
@@ -280,10 +326,10 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)
             }).then(() => {
-                alert("Tahniah! Markah PBD anda telah direkodkan.");
+                alert("Tahniah! Markah PBD anda telah berjaya direkodkan dalam sistem Cikgu.");
                 btn.innerText = "Selesai Direkod";
             }).catch(error => {
-                alert("Ralat semasa menghantar data. Sila semak sambungan internet.");
+                alert("Ralat semasa menghantar data. Sila maklumkan kepada Cikgu.");
                 btn.innerText = "Hantar Markah PBD";
                 btn.classList.replace('bg-gray-500', 'bg-green-600');
                 btn.disabled = false;
