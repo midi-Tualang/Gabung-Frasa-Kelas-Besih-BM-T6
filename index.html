@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Latihan Bina Ayat: Kebersihan Kelas</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .selected { transform: scale(0.95); opacity: 0.7; border-color: #2563eb; border-width: 2px; }
+        .disabled { pointer-events: none; opacity: 0.3; }
+    </style>
+</head>
+<body class="bg-gray-100 p-4 md:p-8 font-sans">
+
+    <div class="max-w-4xl mx-auto bg-white rounded-xl shadow-lg p-6">
+        <h1 class="text-2xl font-bold text-center text-blue-700 mb-6">Latihan Jadual Penggantian: Penutup Karangan</h1>
+        
+        <!-- Borang Maklumat Murid -->
+        <div id="studentForm" class="mb-8 p-4 bg-blue-50 rounded-lg">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <input type="text" id="nama" placeholder="Nama Penuh" class="p-2 border rounded" required>
+                <input type="text" id="kelas" placeholder="Kelas" class="p-2 border rounded" required>
+            </div>
+            <button onclick="mulaLatihan()" class="mt-4 w-full bg-blue-600 text-white p-2 rounded hover:bg-blue-700 font-bold">Mula Latihan</button>
+        </div>
+
+        <!-- Ruangan Latihan (Disembunyikan pada awalnya) -->
+        <div id="exerciseArea" class="hidden">
+            <p class="text-gray-600 text-center mb-6">Pilih satu frasa dari Lajur A, Lajur B, dan Lajur C untuk membentuk ayat yang betul.</p>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+                <!-- Lajur A -->
+                <div>
+                    <h3 class="font-bold text-center bg-blue-200 p-2 rounded-t">Lajur A</h3>
+                    <div id="colA" class="flex flex-col gap-2 p-2 bg-blue-50 rounded-b min-h-[200px]"></div>
+                </div>
+                <!-- Lajur B -->
+                <div>
+                    <h3 class="font-bold text-center bg-yellow-200 p-2 rounded-t">Lajur B</h3>
+                    <div id="colB" class="flex flex-col gap-2 p-2 bg-yellow-50 rounded-b min-h-[200px]"></div>
+                </div>
+                <!-- Lajur C -->
+                <div>
+                    <h3 class="font-bold text-center bg-green-200 p-2 rounded-t">Lajur C</h3>
+                    <div id="colC" class="flex flex-col gap-2 p-2 bg-green-50 rounded-b min-h-[200px]"></div>
+                </div>
+            </div>
+
+            <!-- Paparan Status Cantuman -->
+            <div id="statusCantuman" class="text-center mb-4 font-semibold text-lg"></div>
+
+            <!-- Paparan Karangan Lengkap -->
+            <div class="mt-8 border-t pt-6">
+                <h3 class="font-bold text-lg mb-2 text-gray-800">Perenggan Lengkap Anda:</h3>
+                <div id="completedSentences" class="p-4 bg-gray-50 border rounded min-h-[100px] text-gray-700 leading-relaxed text-justify">
+                    <!-- Ayat yang berjaya dicantum akan muncul di sini -->
+                </div>
+            </div>
+
+            <button id="btnHantar" onclick="hantarData()" class="mt-6 w-full bg-green-600 text-white p-3 rounded hover:bg-green-700 font-bold hidden">Hantar Markah PBD</button>
+        </div>
+    </div>
+
+    <script>
+        // MASUKKAN URL GOOGLE APPS SCRIPT DI SINI
+        const gasURL = "https://script.google.com/macros/s/AKfycbxGvYFd2WiZf75yo1MMVpf4m239WtWfKYWk_tNaAKHpbhI80-G2PocWppl14Dkv-Oo/exec";
+
+        // Data Jadual Penggantian (Perenggan Penutup)
+        const dataAyat = [
+            { id: 1, a: "Kesimpulannya, menjaga kebersihan", b: "kelas adalah tanggungjawab", c: "semua murid di sekolah." },
+            { id: 2, a: "Kelas yang bersih akan", b: "membantu kita mencapai", c: "kecemerlangan dalam pelajaran." },
+            { id: 3, a: "Bak kata pepatah,", b: "amalan kerjasama ini ibarat", c: "\"muafakat membawa berkat\"." }
+        ];
+
+        let pilihan = { a: null, b: null, c: null };
+        let markah = 0;
+        let bilanganBetul = 0;
+
+        function mulaLatihan() {
+            const nama = document.getElementById('nama').value;
+            const kelas = document.getElementById('kelas').value;
+            if(!nama || !kelas) { alert("Sila masukkan nama dan kelas."); return; }
+            
+            document.getElementById('studentForm').classList.add('hidden');
+            document.getElementById('exerciseArea').classList.remove('hidden');
+            janaBongkah();
+        }
+
+        function rawakSusunan(array) {
+            return array.sort(() => Math.random() - 0.5);
+        }
+
+        function janaBongkah() {
+            const colA = document.getElementById('colA');
+            const colB = document.getElementById('colB');
+            const colC = document.getElementById('colC');
+
+            let frasaA = rawakSusunan(dataAyat.map(d => ({id: d.id, teks: d.a})));
+            let frasaB = rawakSusunan(dataAyat.map(d => ({id: d.id, teks: d.b})));
+            let frasaC = rawakSusunan(dataAyat.map(d => ({id: d.id, teks: d.c})));
+
+            colA.innerHTML = frasaA.map(f => `<button id="a-${f.id}" onclick="pilihFrasa('a', ${f.id}, this)" class="p-3 bg-white border shadow-sm rounded text-sm text-left hover:bg-blue-100 transition">${f.teks}</button>`).join('');
+            colB.innerHTML = frasaB.map(f => `<button id="b-${f.id}" onclick="pilihFrasa('b', ${f.id}, this)" class="p-3 bg-white border shadow-sm rounded text-sm text-left hover:bg-yellow-100 transition">${f.teks}</button>`).join('');
+            colC.innerHTML = frasaC.map(f => `<button id="c-${f.id}" onclick="pilihFrasa('c', ${f.id}, this)" class="p-3 bg-white border shadow-sm rounded text-sm text-left hover:bg-green-100 transition">${f.teks}</button>`).join('');
+        }
+
+        function pilihFrasa(lajur, id, elemen) {
+            // Buang class 'selected' dari lajur yang sama
+            document.querySelectorAll(`#col${lajur.toUpperCase()} button`).forEach(btn => btn.classList.remove('selected'));
+            
+            // Tambah class 'selected' pada elemen diklik
+            elemen.classList.add('selected');
+            pilihan[lajur] = { id: id, teks: elemen.innerText, el: elemen };
+
+            semakCantuman();
+        }
+
+        function semakCantuman() {
+            const status = document.getElementById('statusCantuman');
+            
+            if (pilihan.a && pilihan.b && pilihan.c) {
+                if (pilihan.a.id === pilihan.b.id && pilihan.b.id === pilihan.c.id) {
+                    status.innerHTML = "<span class='text-green-600'>Tahniah! Cantuman ayat betul.</span>";
+                    markah += 10;
+                    bilanganBetul++;
+                    
+                    // Masukkan ke ruangan karangan
+                    const perenggan = document.getElementById('completedSentences');
+                    perenggan.innerHTML += `${pilihan.a.teks} ${pilihan.b.teks} ${pilihan.c.teks} `;
+
+                    // Matikan butang yang dah betul
+                    pilihan.a.el.classList.add('disabled', 'bg-gray-200');
+                    pilihan.b.el.classList.add('disabled', 'bg-gray-200');
+                    pilihan.c.el.classList.add('disabled', 'bg-gray-200');
+                    
+                    resetPilihan();
+
+                    if (bilanganBetul === dataAyat.length) {
+                        document.getElementById('btnHantar').classList.remove('hidden');
+                        status.innerHTML = "<span class='text-green-600'>Syabas! Anda telah melengkapkan perenggan ini. Sila hantar markah.</span>";
+                    }
+                } else {
+                    status.innerHTML = "<span class='text-red-600'>Cantuman kurang tepat. Sila cuba lagi!</span>";
+                    markah -= 2; // Tolak markah jika salah cantum (opsyenal)
+                    resetPilihanSemuka();
+                }
+            }
+        }
+
+        function resetPilihan() { pilihan = { a: null, b: null, c: null }; }
+
+        function resetPilihanSemuka() {
+            if(pilihan.a) pilihan.a.el.classList.remove('selected');
+            if(pilihan.b) pilihan.b.el.classList.remove('selected');
+            if(pilihan.c) pilihan.c.el.classList.remove('selected');
+            resetPilihan();
+        }
+
+        function hantarData() {
+            const btn = document.getElementById('btnHantar');
+            btn.innerText = "Menghantar...";
+            btn.disabled = true;
+
+            const payload = {
+                nama: document.getElementById('nama').value,
+                kelas: document.getElementById('kelas').value,
+                markah: markah > 0 ? markah : 0 
+            };
+
+            fetch(gasURL, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            }).then(() => {
+                alert("Markah PBD telah berjaya direkodkan!");
+                btn.innerText = "Selesai";
+                btn.classList.replace('bg-green-600', 'bg-gray-500');
+            }).catch(error => {
+                alert("Ralat semasa menghantar data.");
+                btn.innerText = "Hantar Markah PBD";
+                btn.disabled = false;
+            });
+        }
+    </script>
+</body>
+</html>
